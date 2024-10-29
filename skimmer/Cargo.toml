@@ -1,12 +1,12 @@
 [package]
-name = "skimmer"
+name = "sk-skimmer"
 version = "0.10.4"
 authors = ["Loric Andre", "Zhang Jinzhou <lotabout@gmail.com>"]
 description = "Fuzzy Finder in rust!"
 documentation = "https://docs.rs/skimmer"
 homepage = "https://github.com/LoricAndre/skimmer"
 repository = "https://github.com/LoricAndre/skimmer"
-readme  = "README.md"
+readme  = "../README.md"
 keywords = ["fuzzy", "menu", "util"]
 license = "MIT"
 edition = "2021"

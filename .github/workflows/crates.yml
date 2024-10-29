@@ -23,7 +23,5 @@ jobs:
       with:
         command: check
     - name: Login crates.io
-      run: cargo login ${CRATES_IO_TOKEN}
-      env:
-        CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
-    - run: cargo publish
+      run: cargo login
+    - run: cargo publish -p sk-skimmer
