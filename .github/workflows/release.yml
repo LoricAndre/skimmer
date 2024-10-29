@@ -1,0 +1,116 @@
+name: Release
+
+on:
+  push:
+    tags:
+    - 'v[0-9]+.[0-9]+.[0-9]+'
+
+env:
+  # Define the rust version to use
+  RUST_VERSION: 1.82.0
+  # Rust build arguments
+  BUILD_ARGS: "--release --all-features"
+  BIN_NAME: "sk"
+
+jobs:
+  publish-crate:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - name: Install correct toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ env.RUST_VERSION }}
+        override: true
+    - name: Run cargo check
+      uses: actions-rs/cargo@v1
+      with:
+        command: check
+    - name: Publish to crates.io
+      run: cargo publish -p sk-skimmer
+      env:
+        CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+  build:
+    name: Build - ${{ matrix.platform.name }}
+    # By default, runs on Ubuntu, otherwise, override with the desired os
+    runs-on: ${{ matrix.platform.os || 'ubuntu-22.04' }}
+    strategy:
+      matrix:
+        # Set platforms you want to build your binaries on
+        platform:
+          # Linux
+            # The name is used for pretty print
+          - name: Linux x86_64
+            # The used Rust target architecture
+            target: x86_64-unknown-linux-gnu
+          - name: Linux aarch64
+            target: aarch64-unknown-linux-gnu
+
+          # Mac OS
+          - name: MacOS x86_64
+            target: x86_64-apple-darwin
+          - name: MacOS aarch64
+            target: aarch64-apple-darwin
+
+          # # Windows
+          # - name: Windows x86_64
+          #   # Use another GitHub action OS
+          #   os: windows-latest
+          #   target: x86_64-pc-windows-msvc
+
+    steps:
+    - name: Checkout Git repo
+      uses: actions/checkout@v4
+
+    # Linux & Windows
+    - name: "[Win & Linux] Install rust toolchain"
+      if: ${{ !contains(matrix.platform.target, 'apple') }}
+      uses: actions-rs/toolchain@v1
+      with:
+        # We setup Rust toolchain and the desired target
+        profile: minimal
+        toolchain: stable
+        override: true
+        target: ${{ matrix.platform.target }}
+        components: rustfmt, clippy
+    - name: "[Win & Linux] Build ${{ matrix.platform.name }} binary"
+      if: ${{ !contains(matrix.platform.target, 'apple') }}
+      uses: actions-rs/cargo@v1
+      # We use cross-rs if not running on x86_64 architecture on Linux
+      with:
+        command: build
+        use-cross: ${{ !contains(matrix.platform.target, 'x86_64') }}
+        args: ${{ env.BUILD_ARGS }} --target ${{ matrix.platform.target }}
+
+    # Mac OS
+    - name: "[MacOS] Build ${{ matrix.platform.name }} binary"
+      if: contains(matrix.platform.target, 'apple')
+      # We use a dedicated Rust image containing required Apple libraries to cross-compile on multiple archs
+      run: |
+        docker run --rm --volume "${PWD}":/root/src --workdir /root/src joseluisq/rust-linux-darwin-builder:${RUST_VERSION} \
+        sh -c "CC=o64-clang CXX=o64-clang++ cargo build $BUILD_ARGS --target ${{ matrix.platform.target }}"
+    
+    - name: Store artifact
+      uses: actions/upload-artifact@v3
+      with:
+        # Finally, we store the binary as GitHub artifact for later usage
+        name: ${{ matrix.platform.target }}-${{ env.BIN_NAME }}
+        path: target/${{ matrix.platform.target }}/release/${{ env.BIN_NAME }}${{ contains(matrix.platform.target, 'windows') && '.exe' || '' }}
+        retention-days: 1
+  release:
+    runs-on: ubuntu-22.04
+    needs: [build]
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        path: artifacts
+    - name: Create github release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          artifacts/*
