@@ -1,2 +1,10 @@
 dist
 target
+man/man1/sk.1
+shell/bash/sk-completion.bash
+shell/elvish/sk.elv
+shell/fig/sk.ts
+shell/fish/sk.fish
+shell/nushell/sk-completion.nu
+shell/powershell/sk-completion.ps1
+shell/zsh/_zsh
