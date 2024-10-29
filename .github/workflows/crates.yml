@@ -22,4 +22,7 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: check
-    - run: cargo publish -p sk-skimmer
+    - name: Publish to crates.io
+      run: cargo publish -p sk-skimmer
+      env:
+        CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
