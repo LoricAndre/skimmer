@@ -3,7 +3,7 @@ extern crate clap;
 extern crate env_logger;
 extern crate log;
 extern crate shlex;
-extern crate skim;
+extern crate skimmer;
 extern crate time;
 
 use crate::context::SkimContext;
@@ -14,7 +14,7 @@ use std::fs::File;
 use std::io::{BufReader, BufWriter, Write};
 
 use clap::Parser;
-use skim::prelude::*;
+use skimmer::prelude::*;
 
 fn parse_args() -> SkimOptions {
     let mut args = Vec::new();

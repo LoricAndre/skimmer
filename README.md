@@ -353,8 +353,8 @@ skim = "*"
 Then try to run this simple example:
 
 ```rust
-extern crate skim;
-use skim::prelude::*;
+extern crate skimmer;
+use skimmer::prelude::*;
 use std::io::Cursor;
 
 pub fn main() {
@@ -381,6 +381,7 @@ pub fn main() {
     }
 }
 ```
+
 
 Given an `Option<SkimItemReceiver>`, skim will read items accordingly, do its
 job and bring us back the user selection including the selected items, the

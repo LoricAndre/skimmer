@@ -5,7 +5,7 @@ use std::{
 };
 
 use clap::CommandFactory;
-use skim::options::SkimOptions;
+use skimmer::options::SkimOptions;
 
 type DynError = Box<dyn std::error::Error>;
 
