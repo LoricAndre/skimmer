@@ -46,10 +46,10 @@ fn mangen() -> Result<(), DynError> {
 
 fn compgen() -> Result<(), DynError> {
     let completions_dir = project_root().join("shell");
-    std::fs::create_dir_all(completions_dir.clone())?;
     // Bash
-    let path = completions_dir.clone().join("bash");
     let mut buffer: Vec<u8> = Default::default();
+    let path = completions_dir.clone().join("bash");
+    std::fs::create_dir_all(path.clone())?;
     clap_complete::generate(
         clap_complete::Shell::Bash,
         &mut SkimOptions::command(),
@@ -59,8 +59,9 @@ fn compgen() -> Result<(), DynError> {
     std::fs::write(path.join("sk-completion.bash"), buffer)?;
 
     // Zsh
-    let path = completions_dir.clone().join("zsh");
     let mut buffer: Vec<u8> = Default::default();
+    let path = completions_dir.clone().join("zsh");
+    std::fs::create_dir_all(path.clone())?;
     clap_complete::generate(
         clap_complete::Shell::Zsh,
         &mut SkimOptions::command(),
@@ -72,6 +73,7 @@ fn compgen() -> Result<(), DynError> {
     // Fish
     let mut buffer: Vec<u8> = Default::default();
     let path = completions_dir.clone().join("fish");
+    std::fs::create_dir_all(path.clone())?;
     clap_complete::generate(
         clap_complete::Shell::Fish,
         &mut SkimOptions::command(),
@@ -83,6 +85,7 @@ fn compgen() -> Result<(), DynError> {
     // Elvish
     let mut buffer: Vec<u8> = Default::default();
     let path = completions_dir.clone().join("elvish");
+    std::fs::create_dir_all(path.clone())?;
     clap_complete::generate(
         clap_complete::Shell::Elvish,
         &mut SkimOptions::command(),
@@ -94,6 +97,7 @@ fn compgen() -> Result<(), DynError> {
     // PowerShell
     let mut buffer: Vec<u8> = Default::default();
     let path = completions_dir.clone().join("powershell");
+    std::fs::create_dir_all(path.clone())?;
     clap_complete::generate(
         clap_complete::Shell::PowerShell,
         &mut SkimOptions::command(),
@@ -105,6 +109,7 @@ fn compgen() -> Result<(), DynError> {
     // Nushell
     let mut buffer: Vec<u8> = Default::default();
     let path = completions_dir.clone().join("nushell");
+    std::fs::create_dir_all(path.clone())?;
     clap_complete::generate(
         clap_complete_nushell::Nushell,
         &mut SkimOptions::command(),
@@ -116,6 +121,7 @@ fn compgen() -> Result<(), DynError> {
     // Fig
     let mut buffer: Vec<u8> = Default::default();
     let path = completions_dir.clone().join("fig");
+    std::fs::create_dir_all(path.clone())?;
     clap_complete::generate(clap_complete_fig::Fig, &mut SkimOptions::command(), "sk", &mut buffer);
     std::fs::write(path.join("sk.ts"), buffer)?;
 

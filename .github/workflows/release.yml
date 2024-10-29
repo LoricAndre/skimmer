@@ -92,25 +92,69 @@ jobs:
       run: |
         docker run --rm --volume "${PWD}":/root/src --workdir /root/src joseluisq/rust-linux-darwin-builder:${RUST_VERSION} \
         sh -c "CC=o64-clang CXX=o64-clang++ cargo build $BUILD_ARGS --target ${{ matrix.platform.target }}"
-    
+    - name: Create archive
+      run: tar -C target/*/release/ -czvf "${{ matrix.platform.target }}.tgz" "${{ env.BIN_NAME }}${{ contains(matrix.platform.target, 'windows') && '.exe' || '' }}"
     - name: Store artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        # Finally, we store the binary as GitHub artifact for later usage
         name: ${{ matrix.platform.target }}-${{ env.BIN_NAME }}
-        path: target/${{ matrix.platform.target }}/release/${{ env.BIN_NAME }}${{ contains(matrix.platform.target, 'windows') && '.exe' || '' }}
+        path: "${{ matrix.platform.target }}.tgz"
         retention-days: 1
+  release-files:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Git repo
+        uses: actions/checkout@v4
+      - name: Install correct toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          override: true
+      - name: Generate manpage
+        uses: actions-rs/cargo@v1
+        with:
+          command: run
+          args: --package xtask mangen
+      - name: Generate completions
+        uses: actions-rs/cargo@v1
+        with:
+          command: run
+          args: --package xtask compgen
+      - name: Create release archives
+        run: |
+          mkdir artifacts
+          tar -C man -czvf artifacts/man.tgz man1
+          tar -C shell -czvf artifacts/shell.tgz .
+      - name: Store artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: files
+          path: "artifacts/*.tgz"
+          retention-days: 1
   release:
     runs-on: ubuntu-22.04
     needs: [build]
     permissions:
       contents: write
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
         path: artifacts
-    - name: Create github release
-      uses: softprops/action-gh-release@v2
+        pattern: "*"
+        merge-multiple: true
+    - run: ls -R
+    - name: Update CHANGELOG
+      id: changelog
+      uses: requarks/changelog-action@v1
       with:
-        files: |
-          artifacts/*
+        token: ${{ github.token }}
+        tag: ${{ github.ref_name }}
+    - name: Create Release
+      uses: ncipollo/release-action@v1.12.0
+      with:
+        allowUpdates: true
+        draft: false
+        makeLatest: true
+        body: ${{ steps.changelog.outputs.changes }}
+        artifacts: |
+          artifacts/**
