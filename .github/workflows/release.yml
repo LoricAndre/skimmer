@@ -109,7 +109,8 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
         path: artifacts
-        merge_multiple: true
+        pattern: *-sk
+        merge-multiple: true
     - run: ls -R
     - name: Create github release
       uses: softprops/action-gh-release@v2
