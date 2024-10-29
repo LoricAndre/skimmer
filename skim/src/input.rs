@@ -200,15 +200,36 @@ mod test {
         let key_action_str = format!("ctrl-s:toggle-sort,ctrl-m:execute:{},ctrl-t:toggle", cmd);
 
         let key_action = parse_key_action(key_action_str);
-        assert_eq!(("ctrl-s".to_string(), vec![("toggle-sort".to_string(), None)]), key_action[0]);
-        assert_eq!(("ctrl-m".to_string(), vec![("execute".to_string(), Some(cmd.to_string()))]), key_action[1]);
-        assert_eq!(("ctrl-t".to_string(), vec![("toggle".to_string(), None)]), key_action[2]);
+        assert_eq!(
+            ("ctrl-s".to_string(), vec![("toggle-sort".to_string(), None)]),
+            key_action[0]
+        );
+        assert_eq!(
+            (
+                "ctrl-m".to_string(),
+                vec![("execute".to_string(), Some(cmd.to_string()))]
+            ),
+            key_action[1]
+        );
+        assert_eq!(
+            ("ctrl-t".to_string(), vec![("toggle".to_string(), None)]),
+            key_action[2]
+        );
 
         let key_action_str = "f1:execute(less -f {}),ctrl-y:execute-silent(echo {} | pbcopy)";
         let key_action = parse_key_action(key_action_str.to_string());
-        assert_eq!(("f1".to_string(), vec![("execute".to_string(), Some("less -f {}".to_string()))]), key_action[0]);
         assert_eq!(
-            ("ctrl-y".to_string(), vec![("execute-silent".to_string(), Some("echo {} | pbcopy".to_string()))]),
+            (
+                "f1".to_string(),
+                vec![("execute".to_string(), Some("less -f {}".to_string()))]
+            ),
+            key_action[0]
+        );
+        assert_eq!(
+            (
+                "ctrl-y".to_string(),
+                vec![("execute-silent".to_string(), Some("echo {} | pbcopy".to_string()))]
+            ),
             key_action[1]
         );
 
@@ -216,7 +237,10 @@ mod test {
         let key_action_str = "enter:execute($EDITOR +{2} {1})";
         let key_action = parse_key_action(key_action_str.to_string());
         assert_eq!(
-            ("enter".to_string(), vec![("execute".to_string(), Some("$EDITOR +{2} {1}".to_string()))]),
+            (
+                "enter".to_string(),
+                vec![("execute".to_string(), Some("$EDITOR +{2} {1}".to_string()))]
+            ),
             key_action[0]
         );
     }
@@ -224,11 +248,23 @@ mod test {
     #[test]
     fn action_chain_should_be_parsed() {
         let key_action = parse_key_action("ctrl-t:toggle+up".to_string());
-        assert_eq!(("ctrl-t".to_string(), vec![("toggle".to_string(), None), ("up".to_string(), None)]), key_action[0]);
+        assert_eq!(
+            (
+                "ctrl-t".to_string(),
+                vec![("toggle".to_string(), None), ("up".to_string(), None)]
+            ),
+            key_action[0]
+        );
 
         let key_action_str = "f1:execute(less -f {}),ctrl-y:execute-silent(echo {} | pbcopy)+abort";
         let key_action = parse_key_action(key_action_str.to_string());
-        assert_eq!(("f1".to_string(), vec![("execute".to_string(), Some("less -f {}".to_string()))]), key_action[0]);
+        assert_eq!(
+            (
+                "f1".to_string(),
+                vec![("execute".to_string(), Some("less -f {}".to_string()))]
+            ),
+            key_action[0]
+        );
         assert_eq!(
             (
                 "ctrl-y".to_string(),

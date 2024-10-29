@@ -68,7 +68,7 @@ fn compgen() -> Result<(), DynError> {
         &mut buffer,
     );
     std::fs::write(path.join("_zsh"), buffer)?;
-    
+
     // Fish
     let mut buffer: Vec<u8> = Default::default();
     let path = completions_dir.clone().join("fish");
@@ -112,16 +112,11 @@ fn compgen() -> Result<(), DynError> {
         &mut buffer,
     );
     std::fs::write(path.join("sk-completion.nu"), buffer)?;
-    
+
     // Fig
     let mut buffer: Vec<u8> = Default::default();
     let path = completions_dir.clone().join("fig");
-    clap_complete::generate(
-        clap_complete_fig::Fig,
-        &mut SkimOptions::command(),
-        "sk",
-        &mut buffer,
-    );
+    clap_complete::generate(clap_complete_fig::Fig, &mut SkimOptions::command(), "sk", &mut buffer);
     std::fs::write(path.join("sk.ts"), buffer)?;
 
     Ok(())

@@ -66,7 +66,7 @@ fn sk_main() -> Result<i32, std::io::Error> {
     let mut ctx = SkimContext {
         cmd_collector: Rc::new(RefCell::new(SkimItemReader::new(reader_opts))),
         query_history: vec![],
-        cmd_history: vec![]
+        cmd_history: vec![],
     };
     ctx.init_histories(&opts);
 
@@ -185,7 +185,6 @@ pub fn filter(
     options: &SkimOptions,
     source: Option<SkimItemReceiver>,
 ) -> Result<i32, std::io::Error> {
-
     let default_command = match env::var("SKIM_DEFAULT_COMMAND").as_ref().map(String::as_ref) {
         Ok("") | Err(_) => "find .".to_owned(),
         Ok(val) => val.to_owned(),

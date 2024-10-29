@@ -303,7 +303,6 @@ impl<'a> IntoIterator for &'a AnsiString {
     }
 }
 
-
 impl From<String> for AnsiString {
     fn from(s: String) -> AnsiString {
         AnsiString::new_raw_string(s)
@@ -313,10 +312,7 @@ impl From<String> for AnsiString {
 // (text, indices, highlight attribute) -> AnsiString
 impl<'a> From<(String, &'a [usize], Attr)> for AnsiString {
     fn from((text, indices, attr): (String, &'a [usize], Attr)) -> Self {
-        let fragments: Vec<Fragment> = indices
-            .iter()
-            .map(|&idx| (attr, (idx, 1 + idx)))
-            .collect();
+        let fragments: Vec<Fragment> = indices.iter().map(|&idx| (attr, (idx, 1 + idx))).collect();
         AnsiString::new_string(text, fragments)
     }
 }

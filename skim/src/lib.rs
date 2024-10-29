@@ -27,6 +27,7 @@ pub use crate::output::SkimOutput;
 use crate::reader::Reader;
 
 mod ansi;
+pub mod context;
 mod engine;
 mod event;
 pub mod field;
@@ -48,7 +49,6 @@ mod selection;
 mod spinlock;
 mod theme;
 pub mod util;
-pub mod context;
 
 //------------------------------------------------------------------------------
 pub trait AsAny {
@@ -172,10 +172,7 @@ impl<'a> From<DisplayContext<'a>> for AnsiString {
             Matches::ByteRange(start, end) => {
                 let ch_start = context.text[..start].chars().count();
                 let ch_end = ch_start + context.text[start..end].chars().count();
-                AnsiString::new_string(
-                    context.text,
-                    vec![(context.highlight_attr, (ch_start, ch_end))],
-                )
+                AnsiString::new_string(context.text, vec![(context.highlight_attr, (ch_start, ch_end))])
             }
             Matches::None => AnsiString::new_string(context.text, vec![]),
         }
@@ -225,15 +222,13 @@ pub enum ItemPreview {
 //==============================================================================
 // A match engine will execute the matching algorithm
 
-#[derive(Eq, PartialEq, Debug, Copy, Clone)]
-#[derive(Default)]
+#[derive(Eq, PartialEq, Debug, Copy, Clone, Default)]
 pub enum CaseMatching {
     Respect,
     Ignore,
     #[default]
     Smart,
 }
-
 
 impl clap::ValueEnum for CaseMatching {
     fn value_variants<'a>() -> &'a [Self] {
@@ -248,7 +243,6 @@ impl clap::ValueEnum for CaseMatching {
         }
     }
 }
-
 
 #[derive(PartialEq, Eq, Clone, Debug)]
 #[allow(dead_code)]

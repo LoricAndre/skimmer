@@ -529,10 +529,7 @@ where
     })
     .unwrap();
 
-    let lines = out_str
-        .lines()
-        .map(AnsiString::parse)
-        .collect();
+    let lines = out_str.lines().map(AnsiString::parse).collect();
     callback(lines);
 }
 

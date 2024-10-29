@@ -15,7 +15,7 @@ use crate::{CaseMatching, FuzzyAlgorithm};
 ///
 ///          Default command to use when input is tty. On *nix systems, sk runs the command with sh -c, so make  sure  that
 ///          it's POSIX-compliant.
-/// 
+///
 ///      SKIM_DEFAULT_OPTIONS
 ///
 ///          Default options. e.g. export SKIM_DEFAULT_OPTIONS="--multi
@@ -53,8 +53,8 @@ use crate::{CaseMatching, FuzzyAlgorithm};
 ///       core and end with either go, rb, or py.
 ///
 ///       e.g. ^core go$ | rb$ | py$
-/// 
-/// 
+///
+///
 /// EXIT STATUS
 ///     0      Normal exit
 ///     1      No match
@@ -364,7 +364,7 @@ pub struct SkimOptions {
     /// Do not clear screen on exit
     ///
     /// Do not clear finder interface on exit. If skim was started in full screen mode, it will not switch back to the
-    /// original  screen, so you'll have to manually run tput rmcup to return. This option can be used to avoid 
+    /// original  screen, so you'll have to manually run tput rmcup to return. This option can be used to avoid
     /// flickering of the screen when your application needs to start skim multiple times in order.
     #[arg(long, help_heading = "Interface")]
     pub no_clear: bool,
@@ -597,7 +597,7 @@ pub struct SkimOptions {
 
     /// Synchronous search for multi-staged filtering
     ///
-    /// Synchronous search for multi-staged filtering. If specified, 
+    /// Synchronous search for multi-staged filtering. If specified,
     /// skim will launch ncurses finder only after the input stream is complete.
     ///
     ///     e.g. sk --multi | sk --sync
