@@ -126,13 +126,13 @@ jobs:
     - name: Generate manpage
       uses: actions-rs/cargo@v1
       with:
-        command: xtask
-        args: mangen
+        command: run
+        args: run --package xtask mangen
     - name: Generate completions
       uses: actions-rs/cargo@v1
       with:
-        command: xtask
-        args: compgen
+        command: run
+        args: run --package xtask compgen
     - name: Create release archives
       run: |
         tar -C man -czvf man.tgz man1
