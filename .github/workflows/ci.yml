@@ -26,7 +26,7 @@ jobs:
     steps:
     - name: Install dependencies (for Linux)
       run: |
-        sudo apt-get install zsh
+        sudo apt-get install -y zsh tmux
         python3 -V
         tmux -V
         locale
@@ -39,7 +39,6 @@ jobs:
         brew install zsh
         python3 -V
         tmux -V
-        locale
       if: runner.os == 'macOS'
       env:
         HOMEBREW_NO_AUTO_UPDATE: 1
@@ -57,7 +56,11 @@ jobs:
     - name: Build
       run: cargo build --release
     - name: Run Tests
-      run: tmux new-session -d && python3 test/test_skim.py --verbose
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        tmux new-session -d
+        uv run pytest
+      working-directory: e2e
       env:
         LC_ALL: en_US.UTF-8
         TERM: xterm-256color
