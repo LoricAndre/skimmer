@@ -110,7 +110,7 @@ jobs:
       with:
         path: artifacts
         merge_multiple: true
-    - run: ls -R artifacts
+    - run: ls -R
     - name: Create github release
       uses: softprops/action-gh-release@v2
       with:
