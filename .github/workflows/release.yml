@@ -109,7 +109,7 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
         path: artifacts
-        pattern: *-sk
+        pattern: "*-sk"
         merge-multiple: true
     - run: ls -R
     - name: Create github release
