@@ -123,8 +123,8 @@ jobs:
       - name: Create release archives
         run: |
           mkdir artifacts
-          tar -C man -czvf man.tgz man1
-          tar -C shell -czvf shell.tgz .
+          tar -C man -czvf artifacts/man.tgz man1
+          tar -C shell -czvf artifacts/shell.tgz .
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
