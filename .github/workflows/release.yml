@@ -94,7 +94,7 @@ jobs:
         sh -c "CC=o64-clang CXX=o64-clang++ cargo build $BUILD_ARGS --target ${{ matrix.platform.target }}"
     
     - name: Store artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         # Finally, we store the binary as GitHub artifact for later usage
         name: ${{ matrix.platform.target }}-${{ env.BIN_NAME }}
@@ -109,7 +109,7 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
         path: artifacts
-        pattern: "*-sk"
+        pattern: "*"
         merge-multiple: true
     - run: ls -R
     - name: Create github release
