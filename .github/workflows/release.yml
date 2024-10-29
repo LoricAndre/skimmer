@@ -114,12 +114,12 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: run
-          args: run --package xtask mangen
+          args: --package xtask mangen
       - name: Generate completions
         uses: actions-rs/cargo@v1
         with:
           command: run
-          args: run --package xtask compgen
+          args: --package xtask compgen
       - name: Create release archives
         run: |
           mkdir artifacts
