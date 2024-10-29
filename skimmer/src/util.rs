@@ -3,6 +3,7 @@ use std::cmp::{max, min};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::prelude::v1::*;
+use std::str::FromStr;
 
 use regex::{Captures, Regex};
 use tuikit::prelude::*;
@@ -10,7 +11,6 @@ use unicode_width::UnicodeWidthChar;
 
 use crate::field::get_string_by_range;
 use crate::AnsiString;
-use bitflags::_core::str::FromStr;
 
 lazy_static! {
     static ref RE_ESCAPE: Regex = Regex::new(r"['\U{00}]").unwrap();
