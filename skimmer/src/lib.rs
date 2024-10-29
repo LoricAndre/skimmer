@@ -74,7 +74,7 @@ impl<T: Any> AsAny for T {
 /// `downcast` it back to the reference of the original concrete type.
 ///
 /// ```rust
-/// use skim::prelude::*;
+/// use skimmer::prelude::*;
 ///
 /// struct MyItem {}
 /// impl SkimItem for MyItem {

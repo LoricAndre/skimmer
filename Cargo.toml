@@ -1,10 +1,10 @@
 [workspace]
 members = [
-  "skim",
+  "skimmer",
   "xtask"
 ]
 resolver = "2"
-default-members = ["skim"]
+default-members = ["skimmer"]
 
 [profile.release]
 lto = true

@@ -1,19 +1,19 @@
 [package]
-name = "skim"
+name = "sk-skimmer"
 version = "0.10.4"
-authors = ["Zhang Jinzhou <lotabout@gmail.com>", "Loric Andre"]
+authors = ["Loric Andre", "Zhang Jinzhou <lotabout@gmail.com>"]
 description = "Fuzzy Finder in rust!"
-documentation = "https://docs.rs/skim"
-homepage = "https://github.com/LoricAndre/skim"
-repository = "https://github.com/LoricAndre/skim"
-readme  = "README.md"
+documentation = "https://docs.rs/skimmer"
+homepage = "https://github.com/LoricAndre/skimmer"
+repository = "https://github.com/LoricAndre/skimmer"
+readme  = "../README.md"
 keywords = ["fuzzy", "menu", "util"]
 license = "MIT"
 edition = "2021"
 categories = ["command-line-utilities", "text-processing"]
 
 [lib]
-name = "skim"
+name = "skimmer"
 path = "src/lib.rs"
 
 [[bin]]

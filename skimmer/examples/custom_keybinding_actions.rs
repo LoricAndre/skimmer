@@ -1,5 +1,5 @@
-extern crate skim;
-use skim::prelude::*;
+extern crate skimmer;
+use skimmer::prelude::*;
 
 // No action is actually performed on your filesystem!
 // This example only produce friendly print statements!

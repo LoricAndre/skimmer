@@ -1,5 +1,5 @@
-extern crate skim;
-use skim::prelude::*;
+extern crate skimmer;
+use skimmer::prelude::*;
 use std::io::Cursor;
 
 /// `nth` option is supported by SkimItemReader.

@@ -1,5 +1,5 @@
-extern crate skim;
-use skim::prelude::*;
+extern crate skimmer;
+use skimmer::prelude::*;
 
 /// This example illustrates downcasting custom structs that implement
 /// `SkimItem` after calling `Skim::run_with`.

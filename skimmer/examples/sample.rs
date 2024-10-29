@@ -1,5 +1,5 @@
-extern crate skim;
-use skim::prelude::*;
+extern crate skimmer;
+use skimmer::prelude::*;
 
 pub fn main() {
     let options = SkimOptions::default();
