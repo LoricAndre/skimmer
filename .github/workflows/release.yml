@@ -118,7 +118,23 @@ jobs:
       with:
         token: ${{ github.token }}
         tag: ${{ github.ref_name }}
-
+    - name: Install correct toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ env.RUST_VERSION }}
+        override: true
+    - name: Generate manpage
+      uses: actions-rs/cargo@v1
+      with:
+        command: xtask mangen
+    - name: Generate completions
+      uses: actions-rs/cargo@v1
+      with:
+        command: xtask compgen
+    - name: Create release archives
+      run: |
+        tar -C man -czvf man.tgz man1
+        tar -C shell -czvf shell.tgz .
     - name: Create Release
       uses: ncipollo/release-action@v1.12.0
       with:
@@ -126,4 +142,7 @@ jobs:
         draft: false
         makeLatest: true
         body: ${{ steps.changelog.outputs.changes }}
-        artifacts: "artifacts/**"
+        artifacts: |
+          artifacts/**
+          man.tgz
+          shell.tgz
