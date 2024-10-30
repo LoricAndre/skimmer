@@ -230,7 +230,8 @@ if [[ "$opt" =~ "-E" ]]; then
     cat <<< "\"$sk\" $opts < $fifo1 > $fifo2; out=\$? $close; exit \$out" >> $argsf
     cat <&0 > $fifo1 &
   fi
-  tmux popup -d "$PWD" "${tmux_args[@]}" $opt "bash $argsf" > /dev/null 2>&1
+  echo ${tmux_args[@]}
+  echo tmux popup -d "$PWD" "${tmux_args[@]}" $opt "bash $argsf" # > /dev/null 2>&1
   exit $?
 fi
 

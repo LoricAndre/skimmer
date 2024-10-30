@@ -95,6 +95,11 @@ fn sk_main() -> Result<i32, std::io::Error> {
 
     //------------------------------------------------------------------------------
     // output
+    if opts.tmux.is_some() {
+        skimmer::tmux::open_with(&skimmer::tmux::TmuxOptions::from(&opts));
+        return Ok(0);
+    }
+
     let Some(result) = Skim::run_with(&opts, rx_item) else {
         return Ok(135);
     };
