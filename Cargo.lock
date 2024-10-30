@@ -791,7 +791,7 @@ dependencies = [
  "fuzzy-matcher",
  "lazy_static",
  "log",
- "nix 0.25.1",
+ "nix 0.29.0",
  "rand",
  "rayon",
  "regex",

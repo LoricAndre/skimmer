@@ -1,9 +1,10 @@
-use rand::{distributions::Alphanumeric, Rng};
-use tmux_interface::{
-    commands::common::Size, HasSession, KillSession, NewSession, NewWindow, SplitWindow, StdIO, Tmux,
-};
+use std::sync::Arc;
 
-use crate::SkimOptions;
+use rand::{distributions::Alphanumeric, Rng};
+use tmux_interface::{commands::common::Size, Tmux};
+use tuikit::key::Key;
+
+use crate::{event::Event, SkimItem, SkimOptions, SkimOutput};
 
 #[derive(Debug)]
 enum TmuxWindowDir {
@@ -28,66 +29,56 @@ impl From<&str> for TmuxWindowDir {
 }
 
 #[derive(Debug)]
-pub struct TmuxOptions {
-    dir: TmuxWindowDir,
-    width: Size,
-    height: Size,
+pub struct TmuxOptions<'a> {
+    pub width: &'a str,
+    pub height: &'a str,
+    pub x: &'a str,
+    pub y: &'a str,
 }
-fn str_to_pane_size(value: &str) -> Size {
-    match value.chars().last() {
-        Some('%') => Size::Percentage(
-            value[..value.len() - 1]
-                .parse::<usize>()
-                .expect("Invalid percentage for tmux arg"),
-        ),
-        _ => Size::Size(value.parse::<usize>().expect("Invalid row/col count for tmux arg")),
+
+struct SkimTmuxOutput {
+    line: String,
+}
+
+impl SkimItem for SkimTmuxOutput {
+    fn text(&self) -> &str {
+        return &self.line;
     }
 }
 
-impl From<&SkimOptions> for TmuxOptions {
-    fn from(value: &SkimOptions) -> Self {
-        let raw_opt = value.tmux.clone().unwrap();
-        let (raw_dir, size) = raw_opt.split_once(",").unwrap_or((&raw_opt, "50%"));
+impl<'a> From<&'a String> for TmuxOptions<'a> {
+    fn from(value: &'a String) -> Self {
+        let (raw_dir, size) = value.split_once(",").unwrap_or((&value, "50%"));
         let dir = TmuxWindowDir::from(raw_dir);
-        if let Some((lhs, rhs)) = size.split_once(",") {
+        let (height, width) = if let Some((lhs, rhs)) = size.split_once(",") {
             match dir {
-                TmuxWindowDir::Center | TmuxWindowDir::Left | TmuxWindowDir::Right => Self {
-                    dir,
-                    height: str_to_pane_size(rhs),
-                    width: str_to_pane_size(lhs),
-                },
-                TmuxWindowDir::Top | TmuxWindowDir::Bottom => Self {
-                    dir,
-                    height: str_to_pane_size(lhs),
-                    width: str_to_pane_size(rhs),
-                },
+                TmuxWindowDir::Center | TmuxWindowDir::Left | TmuxWindowDir::Right => (rhs, lhs),
+                TmuxWindowDir::Top | TmuxWindowDir::Bottom => (lhs, rhs),
             }
         } else {
             match dir {
-                TmuxWindowDir::Left | TmuxWindowDir::Right => Self {
-                    dir,
-                    height: Size::Percentage(100),
-                    width: str_to_pane_size(size),
-                },
-                TmuxWindowDir::Top | TmuxWindowDir::Bottom => Self {
-                    dir,
-                    height: str_to_pane_size(size),
-                    width: Size::Percentage(100),
-                },
-                TmuxWindowDir::Center => Self {
-                    dir,
-                    height: str_to_pane_size(size),
-                    width: str_to_pane_size(size),
-                },
+                TmuxWindowDir::Left | TmuxWindowDir::Right => ("100%", size),
+                TmuxWindowDir::Top | TmuxWindowDir::Bottom => (size, "100%"),
+                TmuxWindowDir::Center => (size, size),
             }
-        }
+        };
+
+        let (x, y) = match dir {
+            TmuxWindowDir::Center => ("C", "C"),
+            TmuxWindowDir::Top => ("C", "0%"),
+            TmuxWindowDir::Bottom => ("C", "100%"),
+            TmuxWindowDir::Left => ("0%", "C"),
+            TmuxWindowDir::Right => ("100%", "C"),
+        };
+
+        Self { height, width, x, y }
     }
 }
 
-pub fn open_with(opts: &TmuxOptions) {
-    let mut tmux_shell_cmd = String::new();
-    let mut prev_is_tmux_flag = false;
-    let temp_dir_name = format!("sk-tmux-{}",
+pub fn run_with(opts: &SkimOptions) -> Option<SkimOutput> {
+    // Create temp dir for downstream output
+    let temp_dir_name = format!(
+        "sk-tmux-{}",
         &rand::thread_rng()
             .sample_iter(&Alphanumeric)
             .take(8)
@@ -98,6 +89,10 @@ pub fn open_with(opts: &TmuxOptions) {
     std::fs::create_dir(&temp_dir).expect(&format!("Failed to create temp dir {}", temp_dir.display()));
     let tmp_stdout = temp_dir.join("stdout");
     let tmp_stderr = temp_dir.join("stderr");
+
+    // Build args to send to downstream sk invocation
+    let mut tmux_shell_cmd = String::new();
+    let mut prev_is_tmux_flag = false;
     for arg in std::env::args() {
         if prev_is_tmux_flag {
             prev_is_tmux_flag = false;
@@ -112,14 +107,70 @@ pub fn open_with(opts: &TmuxOptions) {
         tmux_shell_cmd.push_str(&format!(" {arg}"));
     }
     tmux_shell_cmd.push_str(&format!(" >{} 2>{}", tmp_stdout.display(), tmp_stderr.display()));
-    Tmux::with_command(
-        tmux_interface::commands::DisplayPopup::new()
-            .height(opts.height.clone())
-            .width(opts.width.clone())
-            .shell_command(tmux_shell_cmd)
-            .close_on_exit()
-            .build(),
-    )
-    .output()
-    .expect("Failed to run command in popup");
+
+    // Run downstream sk in tmux
+    let raw_tmux_opts = &opts.tmux.clone().unwrap();
+    let tmux_opts = TmuxOptions::from(raw_tmux_opts);
+    let tmux_cmd = tmux_interface::commands::tmux_command::TmuxCommand::new()
+        .name("popup")
+        .push_flag("-E")
+        .push_option("-h", tmux_opts.height)
+        .push_option("-w", tmux_opts.width)
+        .push_option("-x", tmux_opts.x)
+        .push_option("-y", tmux_opts.y)
+        .push_param(tmux_shell_cmd)
+        .to_owned();
+
+    let status = Tmux::with_command(tmux_cmd)
+        .output()
+        .expect("Failed to run command in popup")
+        .status();
+
+    let output_ending = if opts.print0 { "\0" } else { "\n" };
+    let stdout_bytes = std::fs::read_to_string(tmp_stdout).unwrap_or_default();
+    let mut stdout = stdout_bytes.split(output_ending);
+
+    let query_str = if opts.print_query && status.success() {
+        stdout.next().expect("Not enough lines to unpack in downstream result")
+    } else {
+        ""
+    };
+
+    let command_str = if opts.print_cmd && status.success() {
+        stdout.next().expect("Not enough lines to unpack in downstream result")
+    } else {
+        ""
+    };
+
+    let accept_key = if !opts.expect.is_empty() && status.success() {
+        Some(
+            stdout
+                .next()
+                .expect("Not enough lines to unpack in downstream result")
+                .to_string(),
+        )
+    } else {
+        None
+    };
+
+    let mut selected_items: Vec<Arc<dyn SkimItem>> = vec![];
+    for line in stdout {
+        selected_items.push(Arc::new(SkimTmuxOutput { line: line.to_string() }));
+    }
+
+    let is_abort = !status.success();
+    let final_event = match is_abort {
+        true => Event::EvActAbort,
+        false => Event::EvActAccept(accept_key),
+    };
+
+    let skim_output = SkimOutput {
+        final_event,
+        is_abort,
+        final_key: Key::Null,
+        query: query_str.to_string(),
+        cmd: command_str.to_string(),
+        selected_items,
+    };
+    Some(skim_output)
 }

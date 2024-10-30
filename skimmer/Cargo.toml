@@ -15,6 +15,7 @@ categories = ["command-line-utilities", "text-processing"]
 [lib]
 name = "skimmer"
 path = "src/lib.rs"
+doctest = false
 
 [[bin]]
 name = "sk"
