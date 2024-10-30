@@ -29,7 +29,7 @@ jobs:
     runs-on: ${{ contains(matrix.os, 'apple') && 'macos' || 'ubuntu' }}-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
       - name: Clippy
@@ -42,13 +42,13 @@ jobs:
         uses: houseabsolute/actions-rust-cross@v0
         with:
           command: clippy
-          target: ${{ matrix.arch }}-${{ matrix.os }}
+          target: ${{ matrix.arch }}-${{ matrix.os }}${{ contains(matrix.arch, 'arm') && 'eabi' || '' }}
           args: "--locked"
       - name: Run unit tests
         uses: houseabsolute/actions-rust-cross@v0
         with:
           command: test
-          target: ${{ matrix.arch }}-${{ matrix.os }}
+          target: ${{ matrix.arch }}-${{ matrix.os }}${{ contains(matrix.arch, 'arm') && 'eabi' || '' }}
           args: "--locked"
   e2e:
     strategy:
@@ -75,7 +75,7 @@ jobs:
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
       - name: Run E2E Tests
