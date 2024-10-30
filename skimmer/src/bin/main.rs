@@ -1,4 +1,3 @@
-extern crate atty;
 extern crate clap;
 extern crate env_logger;
 extern crate log;
@@ -9,9 +8,9 @@ extern crate time;
 use crate::context::SkimContext;
 use derive_builder::Builder;
 use reader::CommandCollector;
-use std::env;
 use std::fs::File;
-use std::io::{BufReader, BufWriter, Write};
+use std::io::{BufReader, BufWriter, IsTerminal, Write};
+use std::{env, io};
 
 use clap::Parser;
 use skimmer::prelude::*;
@@ -80,7 +79,7 @@ fn sk_main() -> Result<i32, std::io::Error> {
 
     //------------------------------------------------------------------------------
     // read from pipe or command
-    let rx_item = if atty::isnt(atty::Stream::Stdin) {
+    let rx_item = if !io::stdin().is_terminal() {
         let rx_item = ctx.cmd_collector.borrow().of_bufread(BufReader::new(std::io::stdin()));
         Some(rx_item)
     } else {
