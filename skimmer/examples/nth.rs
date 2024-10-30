@@ -12,7 +12,7 @@ pub fn main() {
         .query(Some(String::from("f")))
         .build()
         .unwrap();
-    let item_reader = SkimItemReader::new(SkimItemReaderOption::default().nth(&vec![String::from("2")]).build());
+    let item_reader = SkimItemReader::new(SkimItemReaderOption::default().nth(&[String::from("2")]).build());
 
     let items = item_reader.of_bufread(Cursor::new(input));
     let selected_items = Skim::run_with(&options, Some(items))

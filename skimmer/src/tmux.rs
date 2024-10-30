@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use rand::{distributions::Alphanumeric, Rng};
-use tmux_interface::{commands::common::Size, Tmux};
+use tmux_interface::Tmux;
 use tuikit::key::Key;
 
 use crate::{event::Event, SkimItem, SkimOptions, SkimOutput};
@@ -42,13 +42,13 @@ struct SkimTmuxOutput {
 
 impl SkimItem for SkimTmuxOutput {
     fn text(&self) -> &str {
-        return &self.line;
+        &self.line
     }
 }
 
 impl<'a> From<&'a String> for TmuxOptions<'a> {
     fn from(value: &'a String) -> Self {
-        let (raw_dir, size) = value.split_once(",").unwrap_or((&value, "50%"));
+        let (raw_dir, size) = value.split_once(",").unwrap_or((value, "50%"));
         let dir = TmuxWindowDir::from(raw_dir);
         let (height, width) = if let Some((lhs, rhs)) = size.split_once(",") {
             match dir {
@@ -86,7 +86,7 @@ pub fn run_with(opts: &SkimOptions) -> Option<SkimOutput> {
             .collect::<String>(),
     );
     let temp_dir = std::env::temp_dir().join(&temp_dir_name);
-    std::fs::create_dir(&temp_dir).expect(&format!("Failed to create temp dir {}", temp_dir.display()));
+    std::fs::create_dir(&temp_dir).unwrap_or_else(|_| panic!("Failed to create temp dir {}", temp_dir.display()));
     let tmp_stdout = temp_dir.join("stdout");
     let tmp_stderr = temp_dir.join("stderr");
 
