@@ -85,9 +85,6 @@ mod tests {
     use std::sync::Arc;
     use std::thread;
 
-    #[derive(Eq, PartialEq, Debug)]
-    struct NonCopy(i32);
-
     #[test]
     fn smoke() {
         let m = SpinLock::new(());
