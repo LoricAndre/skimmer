@@ -18,7 +18,6 @@ jobs:
           - arm
           - armv7
         os:
-          - unknown-linux-gnu
           - unknown-linux-musl
           - apple-darwin
         exclude:

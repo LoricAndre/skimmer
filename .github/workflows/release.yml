@@ -40,7 +40,6 @@ jobs:
           - arm
           - armv7
         os:
-          - unknown-linux-gnu
           - unknown-linux-musl
           - apple-darwin
         exclude:
@@ -62,12 +61,12 @@ jobs:
           args: "--release --locked"
       - name: Create archive
         run: |
-          tar -C target/*/release/ -czvf "${{ matrix.arch }}-${{ matrix.os }}${{ contains(matrix.arch, 'arm') && 'eabi' || '' }}.tgz" "${{ env.BIN_NAME }}"
+          tar -C target/*/release/ -czvf "skim-${{ matrix.arch }}-${{ matrix.os }}${{ contains(matrix.arch, 'arm') && 'eabi' || '' }}.tgz" "${{ env.BIN_NAME }}"
       - name: Store artifact
         uses: actions/upload-artifact@v4
         with:
           name: binary-${{ matrix.arch }}-${{ matrix.os }}
-          path: "${{ matrix.arch }}-${{ matrix.os }}${{ contains(matrix.arch, 'arm') && 'eabi' || '' }}.tgz"
+          path: "skim-*.tgz"
           retention-days: 1
   release-files:
     runs-on: ubuntu-22.04
