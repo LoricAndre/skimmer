@@ -1,0 +1,89 @@
+name: Test & Lint
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+    - master
+
+jobs:
+  test:
+    name: Run tests
+    strategy:
+      matrix:
+        arch:
+          - x86_64
+          - aarch64
+          - arm
+          - armv7
+        os:
+          - unknown-linux-gnu
+          - unknown-linux-musl
+          - apple-darwin
+        exclude:
+          - arch: arm
+            os: apple-darwin
+          - arch: armv7
+            os: apple-darwin
+    runs-on: ${{ contains(matrix.os, 'apple') && 'macos' || 'ubuntu' }}-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Clippy
+        uses: houseabsolute/actions-rust-cross@v0
+        with:
+          command: fmt
+          target: ${{ matrix.arch }}-${{ matrix.os }}${{ contains(matrix.arch, 'arm') && 'eabi' || '' }}
+          args: "--locked"
+      - name: Check formatting
+        uses: houseabsolute/actions-rust-cross@v0
+        with:
+          command: clippy
+          target: ${{ matrix.arch }}-${{ matrix.os }}
+          args: "--locked"
+      - name: Run unit tests
+        uses: houseabsolute/actions-rust-cross@v0
+        with:
+          command: test
+          target: ${{ matrix.arch }}-${{ matrix.os }}
+          args: "--locked"
+  e2e:
+    strategy:
+      matrix:
+        runs-on:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - name: "[Linux] Install dependencies"
+        run: |
+          sudo apt-get install -y zsh tmux
+          python3 -V
+          tmux -V
+          locale
+        if: runner.os == 'Linux'
+      - name: "[MacOS] Install dependencies"
+        run: |
+          brew install tmux
+          brew install zsh
+          python3 -V
+          tmux -V
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Run E2E Tests
+        working-directory: e2e
+        env:
+          LC_ALL: en_US.UTF-8
+          TERM: xterm-256color
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          tmux new-session -d
+          uv run pytest
