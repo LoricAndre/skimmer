@@ -64,7 +64,7 @@ case "$(uname -m)" in
   *) ;;
 esac
 
-download "${arch}-${os}"
+download "skim-${arch}-${os}"
 
 check_binary
 
