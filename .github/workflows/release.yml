@@ -61,13 +61,8 @@ jobs:
           target: ${{ matrix.arch }}-${{ matrix.os }}${{ contains(matrix.arch, 'arm') && 'eabi' || '' }}
           args: "--release --locked"
       - name: Create archive
-        run: >
-          tar 
-            -C
-            target/*/release/ 
-            -czvf
-            "${{ matrix.arch }}-${{ matrix.os }}${{ contains(matrix.arch, 'arm') && 'eabi' || '' }}"
-            "${{ env.BIN_NAME }}"
+        run: |
+          tar -C target/*/release/ -czvf "${{ matrix.arch }}-${{ matrix.os }}${{ contains(matrix.arch, 'arm') && 'eabi' || '' }}" "${{ env.BIN_NAME }}"
       - name: Store artifact
         uses: actions/upload-artifact@v4
         with:
