@@ -8,3 +8,4 @@ shell/fish/sk.fish
 shell/nushell/sk-completion.nu
 shell/powershell/sk-completion.ps1
 shell/zsh/_zsh
+bin

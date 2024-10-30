@@ -1,20 +1,14 @@
 #!/usr/bin/env bash
 
-# This script trys to download the correct version of binary from github.
-# You can download it manually and put it(i.e. `sk`) under `bin/`.
-#
-# If you know rust or have rust installed, you can build it with
-# `cargo build --release`
+set -euo pipefail
 
-set -u
-
-version="0.9.4"
+version="0.13.6"
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 skim_base="$(pwd)"
 
 check_binary() {
-  echo -n "  - Checking skim executable ... "
+  echo "Checking skim executable and version... "
   local output
   output=$("$skim_base"/bin/sk --version 2>&1)
   if [ $? -ne 0 ]; then
@@ -22,7 +16,7 @@ check_binary() {
   elif [ "$version" != "$output" ]; then
     echo "$output != $version"
   else
-    echo "$output"
+    echo "Done: $output"
     return 0
   fi
   rm -f "$skim_base"/bin/sk
@@ -39,9 +33,8 @@ download() {
     return
   fi
 
-  check_binary
 
-  local url=https://github.com/lotabout/skim/releases/download/v$version/${1}.tar.gz
+  local url=https://github.com/LoricAndre/skimmer/releases/download/v$version/${1}.tgz
   echo "Downloading: $url"
   if command -v curl > /dev/null; then
     curl -fL $url | tar xz
@@ -58,11 +51,21 @@ download() {
   fi
 }
 
-archi=$(uname -sm)
-case "$archi" in
-  Darwin\ x86_64) download skim-v$version-${binary_arch:-x86_64}-apple-darwin;;
-  Linux\ x86_64)  download skim-v$version-${binary_arch:-x86_64}-unknown-linux-musl;;
+case "$(uname -s)" in
+  "Darwin") os="apple-darwin" ;;
+  "Linux")  os="unknown-linux-musl" ;;
   *) ;;
 esac
+case "$(uname -m)" in
+  "x86_64" | "x64") arch="x86_64" ;;
+  "aarch64") arch="aarch64" ;;
+  "armv7" | "armv7l") arch="armv7" ;;
+  "arm") arch="arm" ;;
+  *) ;;
+esac
+
+download "${arch}-${os}"
+
+check_binary
 
 echo "Done :)"

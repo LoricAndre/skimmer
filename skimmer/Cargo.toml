@@ -1,6 +1,6 @@
 [package]
 name = "sk-skimmer"
-version = "0.13.5"
+version = "0.13.6"
 authors = ["Loric Andre", "Zhang Jinzhou <lotabout@gmail.com>"]
 description = "Fuzzy Finder in rust!"
 documentation = "https://docs.rs/skimmer"
