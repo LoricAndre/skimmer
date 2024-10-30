@@ -487,7 +487,7 @@ mod tests {
     fn test_atoi() {
         assert_eq!(None, atoi::<usize>(""));
         assert_eq!(Some(1), atoi::<usize>("1"));
-        assert_eq!(Some(8589934592), atoi::<usize>("8589934592"));
+        assert_eq!(Some(usize::MAX), atoi::<usize>(&format!("{}", usize::MAX)));
         assert_eq!(Some(1), atoi::<usize>("a1"));
         assert_eq!(Some(1), atoi::<usize>("1b"));
         assert_eq!(Some(1), atoi::<usize>("a1b"));
