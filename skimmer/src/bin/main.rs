@@ -98,7 +98,7 @@ fn sk_main() -> Result<i32, std::io::Error> {
 
     let Some(result) = (match opts.tmux {
         Some(_) => crate::tmux::run_with(&opts),
-        None => Skim::run_with(&opts, rx_item)
+        None => Skim::run_with(&opts, rx_item),
     }) else {
         return Ok(135);
     };

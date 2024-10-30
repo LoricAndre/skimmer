@@ -1,6 +1,5 @@
 use skimmer::tmux::TmuxOptions;
 
-
 #[test]
 fn test_tmux_option_default() {
     let opt = "center,50%".to_string();
@@ -62,7 +61,6 @@ fn test_tmux_option_center_mixed() {
     assert_eq!(opts.x, "C");
     assert_eq!(opts.y, "C");
 }
-
 
 // TOP
 
