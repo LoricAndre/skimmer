@@ -39,7 +39,9 @@ compgen           generate completions for popular shells
 fn mangen() -> Result<(), DynError> {
     let mut buffer: Vec<u8> = Default::default();
     clap_mangen::Man::new(SkimOptions::command()).render(&mut buffer)?;
-    std::fs::write(project_root().join("man").join("man1").join("sk.1"), buffer)?;
+    let mandir = project_root().join("man").join("man1");
+    std::fs::create_dir_all(&mandir)?;
+    std::fs::write(mandir.join("sk.1"), buffer)?;
 
     Ok(())
 }
