@@ -48,8 +48,7 @@ skim provides a single executable: `sk`. Basically anywhere you would want to us
 The skim project contains several components:
 
 1. `sk` executable -- the core.
-2. `sk-tmux` -- script for launching `sk` in a tmux pane.
-3. Vim/Nvim plugin -- to call `sk` inside Vim/Nvim. check [skim.vim](https://github.com/lotabout/skim.vim) for more Vim support.
+2. Vim/Nvim plugin -- to call `sk` inside Vim/Nvim. check [skim.vim](https://github.com/lotabout/skim.vim) for more Vim support.
 
 ## Package Managers
 
