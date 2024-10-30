@@ -55,7 +55,9 @@ jobs:
         override: true
     - name: Build
       run: cargo build --release
-    - name: Run Tests
+    - name: Run unit tests
+      run: cargo test
+    - name: Run E2E Tests
       run: |
         curl -LsSf https://astral.sh/uv/install.sh | sh
         tmux new-session -d
